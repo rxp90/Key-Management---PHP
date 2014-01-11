@@ -1,0 +1,85 @@
+@CHARSET "ISO-8859-1";
+
+.form-signin {
+	min-width: 250px;
+	padding: 16px;
+}
+
+.form-signin input[type="text"] {
+	margin-bottom: -1px;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+.form-signin input[type="password"] {
+	margin-bottom: 10px;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+}
+
+.left-inner-addon {
+	position: relative;
+}
+
+.left-inner-addon input {
+	padding-left: 30px;
+}
+
+.left-inner-addon span {
+	position: absolute;
+	padding: 10px 12px;
+}
+
+.form-signin-big {
+	max-width: 330px;
+	padding: 15px;
+	margin: 0 auto;
+}
+
+.form-signin-big .form-signin-heading,.form-signin .checkbox {
+	margin-bottom: 10px;
+}
+
+.form-signin-big .checkbox {
+	font-weight: normal;
+}
+
+.form-signin-big .form-control {
+	position: relative;
+	font-size: 16px;
+	height: auto;
+	padding: 10px;
+	margin-bottom: 5%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.form-signin-big .form-control:focus {
+	z-index: 2;
+}
+
+.center {
+	margin: 0 auto;
+	width: 50%;
+}
+
+.nav-tabs>li.active>a,.nav-tabs>li.active>a:hover,.nav-tabs>li.active>a:focus
+	{
+	color: #555;
+	cursor: default;
+	background-color: #F0F0F0;
+	border: 1px solid #ddd;
+	border-bottom-color: transparent;
+}
+
+.jumbotron {
+	background-color: white;
+}
+
+.tab-content {
+	border-left: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+	background-color: #F0F0F0;
+}
