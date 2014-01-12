@@ -1,8 +1,15 @@
 <!DOCTYPE html>
+<?php
+if (! isset ( $_SESSION )) {
+	session_start ();
+	var_dump ( $_SESSION );
+	var_dump ( $_POST );
+}
+?>
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Insert title here</title>
+<title>Key Management</title>
 <!-- Latest compiled and minified CSS -->
 <link
 	rel="stylesheet"
@@ -39,11 +46,9 @@
 </head>
 <body>
 	<!-- NavBar -->
-	<?php require("./includes/navbar.php"); ?>
+	<?php include("./includes/navbar.php"); ?>
 	<!-- Content -->
-	<?php require("./includes/welcomeContent.php"); ?>
-		<?php include("./includes/signup.php"); ?>
-	
+	<?php include("./includes/welcomeContent.php"); ?>
 	
 </body>
 </html>

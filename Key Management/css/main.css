@@ -83,3 +83,14 @@
 	border-bottom: 1px solid #ddd;
 	background-color: #F0F0F0;
 }
+
+.alert {
+	font-size: 14px;
+	line-height: normal;
+}
+
+#success {
+	margin-right: 30px;
+	float: left;
+	width: 200px;
+}
