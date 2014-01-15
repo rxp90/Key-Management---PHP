@@ -32,11 +32,6 @@ if (! isset ( $_SESSION )) {
 <script src="http://code.jquery.com/jquery-2.0.2.min.js"></script>
 <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 
-<script
-	type="text/javascript"
-	src="./js/progression.min.js"
-></script>
-
 <!-- Latest compiled and minified JavaScript -->
 <script
 	src="https://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"
@@ -48,7 +43,16 @@ if (! isset ( $_SESSION )) {
 	<!-- NavBar -->
 	<?php include("./includes/navbar.php"); ?>
 	<!-- Content -->
-	<?php include("./includes/welcomeContent.php"); ?>
+	
+	<?php
+	
+	if (isset ( $_SESSION ['user'] )) {
+		include ("./includes/actions.php");
+	} else {
+		include ("./includes/welcomeContent.php");
+	}
+	?>
+	
 	
 </body>
 </html>

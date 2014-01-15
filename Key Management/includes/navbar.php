@@ -1,4 +1,3 @@
-
 <div
 	class="navbar navbar-default navbar-fixed-top"
 	role="navigation"
@@ -24,47 +23,20 @@
 				<li class="active"><a href="#">Home</a></li>
 				<li><a href="#about">About</a></li>
 			</ul>
-			<!-- Sign in -->
-			<ul class="nav navbar-nav navbar-right">
-				<li class="dropdown"><a
-					href="#"
-					class="dropdown-toggle"
-					data-toggle="dropdown"
-				>Sign in<b class="caret"></b></a>
-					<ul class="dropdown-menu">
-						<li>
-							<form class="form-signin">
-
-								<div class="left-inner-addon ">
-									<span class="glyphicon glyphicon-envelope"></span>
-									<input
-										type="text"
-										class="form-control"
-										placeholder="Email address"
-										required=""
-										autofocus=""
-									>
-								</div>
-								<div class="left-inner-addon ">
-									<span class="glyphicon glyphicon-lock"></span>
-									<input
-										type="password"
-										class="form-control"
-										placeholder="Password"
-										required=""
-									>
-								</div>
-
-								<button
-									class="btn btn-primary btn-block"
-									type="submit"
-								>Sign in</button>
-							</form>
-						</li>
-					</ul>
-			
-			</ul>
+			<?php if(isset($_SESSION['user'])){?>
+				<div id="userInfo">
+				Welcome <?php echo $_SESSION['user']->name;?>
+				<a
+					type="button"
+					href="./includes/process.php?action=logout"
+					class="btn btn-default"
+				> <span class="glyphicon glyphicon-off"></span> Logout
+				</a>
+			</div>
+			<?php
+			}
+			?>
 		</div>
 		<!--/.nav-collapse -->
-	</div>
+	</div>	
 </div>

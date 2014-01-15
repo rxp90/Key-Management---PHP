@@ -23,8 +23,8 @@
 		src="../images/success.png"
 	>
 	<div>
-		<h1>Your account was created correctly!</h1>
-		<p>You will be redirected to the main page where you can log in</p>
+		<h1>Created!</h1>
+		<p>You are being redirecting to the main page</p>
 	</div>
 
 </div>
