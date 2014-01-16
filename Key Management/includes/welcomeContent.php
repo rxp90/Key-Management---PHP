@@ -21,15 +21,11 @@ if (! isset ( $_SESSION ['user'] )) { // Only showed if not logged in	?>
 					href="#signin"
 					data-toggle="tab"
 				>Sign in</a></li>
-				<li><a
-					href="#signup"
-					data-toggle="tab"
-				>Create account</a></li>
 			</ul>
 
 			<div class="tab-content">
 				<div
-					class="tab-pane fade active"
+					class="tab-pane active"
 					id="signin"
 				>
 					<form

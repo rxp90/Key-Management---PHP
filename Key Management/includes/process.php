@@ -13,6 +13,7 @@ if ($_GET ['action'] == 'signup') {
 			header ( "Location: ./correctOperation.php" );
 		} else {
 			header ( "Location: ../index.php" );
+			// Usar hashChange para redirigir bien y simular clic
 		}
 		
 		exit ();
@@ -23,8 +24,8 @@ if ($_GET ['action'] == 'createRoom') {
 	if (isset ( $_POST ['createRoomSubmit'] )) {
 		$number = $_POST ['roomNumber'];
 		$building = $_POST ['buildingName'];
-		
-		if (createUser ( $email, $password, $name, $birthdate )) {
+		$type = $_POST ['roomType'];
+		if (createRoom ( $number, $building, $type )) {
 			header ( "Location: ./correctOperation.php" );
 		} else {
 			header ( "Location: ../index.php" );
@@ -50,16 +51,16 @@ if ($_GET ['action'] == 'login') {
 
 // Edit profile
 if ($_GET ['action'] == 'editProfile') {
-	if ($_POST ['edit']) {
+	if (isset ( $_POST ['edit'] )) {
 		$id = $_POST ['editID'];
 		$email = $_POST ['editEmail'];
 		$name = $_POST ['editName'];
 		$birthdate = $_POST ['editBirthdate'];
 		$active = $_POST ['editActive'];
 		$type = $_POST ['editType'];
-		
+		$access = $_POST ['access'];
 		if (checkUserType ( 'ADMIN' ) || $id == $_SESSION ['user']->id) { // Either the user is an ADMIN or he's modifying his own profile
-			if (editUser ( $id, $email, $name, $birthdate, $active, $type )) {
+			if (editUser ( $id, $email, $name, $birthdate, $active, $type, $access )) {
 				header ( "Location: ../index.php" ); // Edited correctly
 			} else {
 				header ( "Location: ../index.php" ); // Error
@@ -78,7 +79,7 @@ if ($_GET ['action'] == 'editProfile') {
 }
 // Edit room
 if ($_GET ['action'] == 'editRoom') {
-	if ($_POST ['edit']) {
+	if (isset ( $_POST ['edit'] )) {
 		$id = $_POST ['editID'];
 		$number = $_POST ['roomNumber'];
 		$building = $_POST ['buildingName'];
@@ -92,11 +93,46 @@ if ($_GET ['action'] == 'editRoom') {
 		exit ();
 	} else if ($_POST ['delete']) {
 		$id = $_POST ['editID'];
-		if (checkUserType ( 'ADMIN' )) { // Either the user is an ADMIN or he's NOT deleting his own profile
+		if (checkUserType ( 'ADMIN' )) {
 			deleteRoom ( $id );
 		} else {
 			// Not allowed to delete
 		}
+	}
+}
+// Lend key
+if (strpos ( $_GET ['action'], 'getKey?id=' ) !== false) { // Not the best way...
+	
+	$pieces = explode ( '=', $_GET ['action'] );
+	$id = $pieces [1];
+	if (isAvailable ( $id )) {
+		addToLog ( $id, $_SESSION ['user']->id );
+	} else {
+		// Key not available
+	}
+}
+// Transfer key
+if (strpos ( $_GET ['action'], 'transferKey?id=' ) !== false) { // Not the best way...
+	
+	$parameters = explode ( '?', $_GET ['action'] );
+	$values = explode ( '=', $parameters );
+	$id = $values [1];
+	$uid = $values [3];
+	if (transferKey ( $keyId, $userID )) {
+		// Correct
+	} else {
+		// Error
+	}
+}
+// Return key
+if (strpos ( $_GET ['action'], 'returnKey?id=' ) !== false) { // Not the best way...
+	
+	$pieces = explode ( '=', $_GET ['action'] );
+	$id = $pieces [1];
+	if (returnKey ( $id )) {
+		// Correct
+	} else {
+		// Error
 	}
 }
 // Logout
