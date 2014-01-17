@@ -2,8 +2,6 @@
 <?php
 if (! isset ( $_SESSION )) {
 	session_start ();
-	var_dump ( $_SESSION );
-	var_dump ( $_POST );
 }
 ?>
 <html>
@@ -43,16 +41,18 @@ if (! isset ( $_SESSION )) {
 	<!-- NavBar -->
 	<?php include("./includes/navbar.php"); ?>
 	<!-- Content -->
+	<div class="content">
 	
-	<?php
-	
-	if (isset ( $_SESSION ['user'] )) {
-		include ("./includes/actions.php");
-	} else {
-		include ("./includes/welcomeContent.php");
-	}
-	?>
-	
-	
+		<?php
+		
+		if (isset ( $_SESSION ['user'] )) {
+			include ("./includes/actions.php");
+		} else {
+			include ("./includes/welcomeContent.php");
+		}
+		?>
+	</div>
+
+
 </body>
 </html>

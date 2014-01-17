@@ -10,7 +10,7 @@ if (! isset ( $_SESSION ['user'] )) { // Only showed if not logged in	?>
 	<div class="jumbotron">
 		<h1>Welcome</h1>
 		<p>This is a web application for managing keys of Pollub</p>
-		<p>Please, sign in to use the application or create a new account</p>
+		<p>Please, sign in to use the application</p>
 		<div class="center">
 
 			<ul
@@ -56,6 +56,24 @@ if (! isset ( $_SESSION ['user'] )) { // Only showed if not logged in	?>
 								required=""
 							>
 						</div>
+						
+						<?php
+	// ////////////////////// Possible errors
+	if (isset ( $_SESSION ['error'] ['incorrectPassword'] )) {
+		echo '<div class="alert alert-danger">' . $_SESSION ['error'] ['incorrectPassword'] . '</div>';
+	}
+	?>
+	<?php
+	if (isset ( $_SESSION ['error'] ['incorrectUser'] )) {
+		echo '<div class="alert alert-danger">' . $_SESSION ['error'] ['incorrectUser'] . '</div>';
+	}
+	?>
+	<?php
+	if (isset ( $_SESSION ['error'] ['disabledAccount'] )) {
+		echo '<div class="alert alert-danger">' . $_SESSION ['error'] ['disabledAccount'] . '</div>';
+	}
+	// //////////////////////////////////
+	?>
 
 						<button
 							name="loginSubmit"

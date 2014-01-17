@@ -2,6 +2,12 @@
 
 @import url(http://fonts.googleapis.com/css?family=Playfair+Display+SC);
 
+@import url(http://fonts.googleapis.com/css?family=Duru+Sans);
+
+p {
+	font-family: 'Duru Sans', sans-serif;
+}
+
 .form-signin {
 	min-width: 250px;
 	padding: 16px;
@@ -112,4 +118,8 @@ h1 {
 .verticalMenu {
 	width: 20%;
 	float: left;
+}
+
+.content {
+	padding-top: 85px;
 }

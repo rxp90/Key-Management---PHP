@@ -7,7 +7,7 @@ function connect() {
 	) );
 	return $pdo;
 }
-function createUser($email, $password, $name, $birthdate) {
+function createUser($email, $password, $name) {
 	try {
 		if (checkUserType ( 'ADMIN' )) { // Only ADMINs can create accounts
 			$pdo = connect ();
@@ -30,20 +30,15 @@ function createUser($email, $password, $name, $birthdate) {
 				
 				// Add errors and previous values to SESSION variable
 				$_SESSION ['error'] = $error;
-				
 				$_SESSION ['signupEmail'] = $email;
 				$_SESSION ['signupName'] = $name;
-				$_SESSION ['signupBirthdate'] = $birthdate;
-				
-				return false; // Registration failed
+				unset ( $_SESSION ['success'] );
 			} else {
-				
 				unset ( $_SESSION ['error'] );
 				
-				$stmt = $pdo->prepare ( 'insert into users(id,name,birthdate,email,password,active,type) values (null,:name,:birthdate,:email,:password,:active,:type)' );
+				$stmt = $pdo->prepare ( 'insert into users(id,name,email,password,active,type) values (null,:name,:email,:password,:active,:type)' );
 				
 				$stmt->bindValue ( ':name', $name );
-				$stmt->bindValue ( ':birthdate', $birthdate );
 				$stmt->bindValue ( ':email', $email );
 				$stmt->bindValue ( ':password', crypt ( $password ) );
 				$stmt->bindValue ( ':active', true, PDO::PARAM_BOOL );
@@ -52,8 +47,10 @@ function createUser($email, $password, $name, $birthdate) {
 				$pdo->beginTransaction ();
 				$stmt->execute ();
 				$pdo->commit ();
-				return true; // Registration succeded
+				$_SESSION ['success']['createUser'] = 'User created correctly';
 			}
+			header ( "Location: ../index.php#signup" );
+			exit ();
 		} else {
 			// NO-ADMIN USER TRYNG TO CREATE ACCOUNT
 		}
@@ -61,7 +58,7 @@ function createUser($email, $password, $name, $birthdate) {
 		echo 'Error: ' . $e->getMessage ();
 	}
 }
-function editUser($id, $email, $name, $birthdate, $active, $type, $access) {
+function editUser($id, $email, $name, $active, $type, $access) {
 	try {
 		$pdo = connect ();
 		$error = array ();
@@ -69,6 +66,7 @@ function editUser($id, $email, $name, $birthdate, $active, $type, $access) {
 		if (! isset ( $_SESSION )) {
 			session_start ();
 		}
+		unset ( $_SESSION ['success'] );
 		
 		// Check if email is changed and if so, if already exists
 		
@@ -90,21 +88,20 @@ function editUser($id, $email, $name, $birthdate, $active, $type, $access) {
 				$_SESSION ['editID'] = $id;
 				$_SESSION ['editEmail'] = $email;
 				$_SESSION ['editName'] = $name;
-				$_SESSION ['editBirthdate'] = $birthdate;
 				$_SESSION ['editActive'] = $active;
 				$_SESSION ['editType'] = $type;
-				return false;
+				header ( "Location: ../index.php#userList" );
+				exit ();
 			} else { // Email not changed or not duplicated
 				
 				unset ( $_SESSION ['error'] );
 				// Update USERS table
 				$pdo->beginTransaction ();
 				
-				$update = $pdo->prepare ( 'UPDATE users SET name = :name, email = :email, birthdate = :birthdate, active = :active, type = :type WHERE id = :id' );
+				$update = $pdo->prepare ( 'UPDATE users SET name = :name, email = :email, active = :active, type = :type WHERE id = :id' );
 				
 				$update->bindValue ( ':id', $id );
 				$update->bindValue ( ':name', $name );
-				$update->bindValue ( ':birthdate', $birthdate );
 				$update->bindValue ( ':email', $email );
 				if (checkUserType ( 'ADMIN' )) { // Only an ADMIN can change this values
 					$update->bindValue ( ':active', $active, PDO::PARAM_BOOL );
@@ -134,8 +131,13 @@ function editUser($id, $email, $name, $birthdate, $active, $type, $access) {
 					$getNewUser->execute ();
 					$user = $getNewUser->fetchobject ();
 					$_SESSION ['user'] = $user; // Update the user in the session
+					$_SESSION ['success'] ['editProfile'] = 'Your profile was updated';
+					header ( "Location: ../index.php#editProfile" );
+					exit ();
 				}
-				return $return;
+				$_SESSION ['success'] ['editUser'] = 'The user was updated';
+				header ( "Location: ../index.php#userList" );
+				exit ();
 			}
 		}
 	} catch ( PDOException $e ) {
@@ -151,6 +153,7 @@ function editRoom($id, $number, $building, $type) {
 		if (! isset ( $_SESSION )) {
 			session_start ();
 		}
+		unset ( $_SESSION ['success'] );
 		
 		// Check if number-building already exists
 		
@@ -174,7 +177,8 @@ function editRoom($id, $number, $building, $type) {
 				$_SESSION ['roomType'] = $type;
 				$_SESSION ['roomNumber'] = $number;
 				$_SESSION ['buildingName'] = $building;
-				return false;
+				header ( "Location: ../index.php#roomList" );
+				exit ();
 			} else { // Correct
 				
 				unset ( $_SESSION ['error'] );
@@ -193,8 +197,10 @@ function editRoom($id, $number, $building, $type) {
 				$update->execute ();
 				$updateKeyType->execute ();
 				$pdo->commit ();
+				$_SESSION ['success'] ['editRoom'] = 'The room was updated';
 				
-				return true; // Registration succeded
+				header ( "Location: ../index.php#roomList" );
+				exit ();
 			}
 		}
 	} catch ( PDOException $e ) {
@@ -209,7 +215,7 @@ function deleteUser($id) {
 		if (! isset ( $_SESSION )) {
 			session_start ();
 		}
-		
+		unset ( $_SESSION ['success'] );
 		// Check if user exists
 		
 		$stmt = $pdo->prepare ( 'select * from users where id = :id' );
@@ -219,7 +225,11 @@ function deleteUser($id) {
 		if ($stmt->rowCount () > 0) { // The user exists
 			$stmt = $pdo->prepare ( 'delete from users where id = :id' );
 			$stmt->bindValue ( ':id', $id );
-			return ($stmt->execute ());
+			$stmt->execute ();
+			$_SESSION ['success'] ['deletedUser'] = 'The user was deleted';
+			
+			header ( "Location: ../index.php#userList" );
+			exit ();
 		} else {
 			
 			// User doesn't exist
@@ -248,7 +258,11 @@ function deleteRoom($id) {
 		if ($stmt->rowCount () > 0) { // The user exists
 			$stmt = $pdo->prepare ( 'delete from rooms where id = :id' );
 			$stmt->bindValue ( ':id', $id );
-			return ($stmt->execute ());
+			$stmt->execute ();
+			$_SESSION ['success'] ['editRoom'] = 'The room was deleted';
+			
+			header ( "Location: ../index.php#roomList" );
+			exit ();
 		} else {
 			
 			// Rooms doesn't exist
@@ -280,15 +294,19 @@ function checkPassword($email, $password) {
 				if ($user->active == 1) {
 					session_regenerate_id ( true ); // to help defend against session fixation and login CSRF
 					$_SESSION ['user'] = $user;
-					return true;
+					unset ( $_SESSION ['error'] );
 				} else { // User not active
+					$_SESSION ['error'] ['disabledAccount'] = 'Your account is disabled. Please contact with the administrator';
 				}
+			} else {
+				$_SESSION ['error'] ['incorrectPassword'] = 'Incorrect password';
 			}
+			header ( "Location: ../index.php" );
+			exit ();
 		} else {
-			
-			// User doesn't exist
-			
-			return false;
+			$_SESSION ['error'] ['incorrectUser'] = 'User does not exist';
+			header ( "Location: ../index.php" );
+			exit ();
 		}
 	} catch ( PDOException $e ) {
 		echo 'Error: ' . $e->getMessage ();
@@ -405,14 +423,16 @@ function getUsersAllowed($keyID) {
 		}
 		// Check if user exists
 		$stmt = $pdo->prepare ( 'select * from room_key where id = :id' );
-		$stmt->bindValue ( ':id', $id );
+		$stmt->bindValue ( ':id', $keyID );
 		$stmt->execute ();
 		if ($stmt->rowCount () == 1) {
 			$key = $stmt->fetchobject ();
 			$type = $key->type;
-			// Get al the users who have access to this type of key
-			$stmt = $pdo->prepare ( 'select user_id from access_list where access_type = :type' );
+			// Get all the users who have access to this type of key
+			$stmt = $pdo->prepare ( 'select user_id from access_list where access_type = :type AND user_id != :id' );
 			$stmt->bindValue ( ':type', $type );
+			$stmt->bindValue ( ':id', $_SESSION ['user']->id );
+			
 			$stmt->execute ();
 			if ($stmt->rowCount () > 0) {
 				$usersID = $stmt->fetchAll ( PDO::FETCH_COLUMN, 0 );
@@ -463,7 +483,7 @@ function getKeyLogs() {
 				<table class="table table-striped">
 				<thead>
 					<tr>
-						<th>Key</th>
+						<th>Room</th>
 						<th>Available / User</th>
 					</tr>
 				</thead>
@@ -494,6 +514,8 @@ function getKeyLogs() {
 							// The user has this key. He can either return the key
 							echo '<a href="./includes/process.php?action=returnKey?id=' . $row ['keys_id'] . '">Return key</a>';
 							// or transfer it
+							echo '//';
+							echo '<a href="#?id=' . $row ['keys_id'] . '" onclick="loadTransferForm(' . $row ['keys_id'] . ')">Transfer key</a>';
 						} else {
 							echo getNameFromID ( $row ['Users_id'] );
 						}
@@ -504,7 +526,9 @@ function getKeyLogs() {
 				}
 				// Accesible keys - Keys in use
 				if (! empty ( $keysInUseArray )) {
-					$queryAvailableKeys = array_diff ( $accessibleKeys, $keysInUseArray );
+					$aux = array_diff ( $accessibleKeys, $keysInUseArray );
+					$queryAvailableKeys = array_values ( $aux ); // Re-index array
+					
 					if (! empty ( $queryAvailableKeys )) {
 						$inQuery2 = implode ( ',', array_fill ( 0, count ( $queryAvailableKeys ), '?' ) );
 						$stmt2 = $pdo->prepare ( 'select * from room_key where id IN(' . $inQuery2 . ')' );
@@ -527,14 +551,14 @@ function getKeyLogs() {
 					}
 				} else {
 					// All the keys are available
-					$inQuery = implode ( ',', array_fill ( 0, count ( $accessibleKeys ), '?' ) );
-					$stmt = $pdo->prepare ( 'select * from room_key where id IN (' . $inQuery . ')' );
+					$inQuery3 = implode ( ',', array_fill ( 0, count ( $accessibleKeys ), '?' ) );
+					$stmt3 = $pdo->prepare ( 'select * from room_key where id IN (' . $inQuery3 . ')' );
 					foreach ( $accessibleKeys as $j => $id ) {
-						$stmt->bindValue ( ($j + 1), $id );
+						$stmt3->bindValue ( ($j + 1), $id );
 					}
-					$stmt->execute ();
-					if ($stmt->rowCount () > 0) {
-						$availableKeys = $stmt->fetchAll ();
+					$stmt3->execute ();
+					if ($stmt3->rowCount () > 0) {
+						$availableKeys = $stmt3->fetchAll ();
 						foreach ( $availableKeys as $row ) {
 							?>
 <tr>
@@ -547,16 +571,38 @@ function getKeyLogs() {
 				}
 				echo '</tbody></table>';
 			}
+			echo '<div id="transferKeyFormAJAX"></div>';
 		} else if (checkUserType ( 'DOORMAN' )) {
 			
 			$stmt = $pdo->prepare ( 'select * from log where active = 1' );
 			$stmt->execute ();
-			if ($stmt->rowCount () == 1) {
+			if ($stmt->rowCount () > 0) {
 				$result = $stmt->fetchAll ();
-				return $result;
+				
+				echo '<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Key</th>
+						<th>Name</th>
+						<th>Time</th>
+					</tr>
+				</thead>
+				<tbody>';
+				foreach ( $result as $row ) :
+					?>
+<tr>
+	<td><?php echo getRoomFromKeyID($row['keys_id']); ?></td>
+	<td><?php echo getNameFromID($row['Users_id']); ?></td>
+	<td><?php echo $row['time']; ?></td>
+</tr>
+<?php
+				endforeach
+				;
+				echo '</tbody>
+								</table>';
 			} else {
-				// Key doesn't exist
-				return false;
+				// All the keys are in the lodge
+				echo '<h3>All the keys are in the lodge</h3>';
 			}
 		}
 	} catch ( PDOException $e ) {
@@ -618,34 +664,10 @@ function returnKey($id) {
 }
 function transferKey($keyId, $userID) {
 	if (returnKey ( $keyId )) {
-		return addToLog ( $id, $userID );
+		return addToLog ( $keyId, $userID );
 	} else {
 		return false;
 	}
-}
-function printKeyLog() {
-	echo '<table class="table table-striped">
-				<thead>
-					<tr>
-						<th>Key</th>
-						<th>Name</th>
-						<th>Time</th>
-					</tr>
-				</thead>
-				<tbody>';
-	$result = getKeyLogs ();
-	foreach ( $result as $row ) :
-		?>
-<tr>
-	<td><?php echo getRoomFromKeyID($row['keys_id']); ?></td>
-	<td><?php echo getNameFromID($row['Users_id']); ?></td>
-	<td><?php echo $row['time']; ?></td>
-</tr>
-<?php
-	endforeach
-	;
-	echo '</tbody>
-				</table>';
 }
 function checkUserType($type) {
 	if (! isset ( $_SESSION )) {
@@ -776,19 +798,23 @@ function printRoomList() {
 function printAdminLinks() {
 	if (checkUserType ( 'ADMIN' )) {
 		echo '<li><a 
+					id="signupLink"
 					href="#signup"
 					data-toggle="pill"
 				>Create account</a></li>';
-		echo '<li><a 	
+		echo '<li><a
+					id="userListLink"
 					href="#userList"
 					data-toggle="pill"
 				>Userlist</a></li>';
-		echo '<li><a 
+		echo '<li><a 			
+					id="createRoomLink"
 					href="#createRoom"
 					data-toggle="pill"
 				>Create room</a></li>';
 		
-		echo '<li><a				
+		echo '<li><a			
+					id="roomListLink"	
 					href="#roomList"
 					data-toggle="pill"
 				>Room list</a></li>';
@@ -797,6 +823,7 @@ function printAdminLinks() {
 function printDoormanLinks() {
 	if (checkUserType ( 'DOORMAN' )) {
 		echo '<li><a
+			id="keyLogsList"
 			href="#keyLogs"
 			data-toggle="pill"
 		>Key logs</a></li>';
@@ -805,6 +832,7 @@ function printDoormanLinks() {
 function printUserLinks() {
 	if (checkUserType ( 'REGULAR' )) {
 		echo '<li><a
+			id="keyLogUserLink"
 			href="#keyLogsUser"
 			data-toggle="pill"
 		>Keys</a></li>';
@@ -888,8 +916,6 @@ function createRoom($number, $building, $type) {
 			
 			$_SESSION ['roomNumber'] = $number;
 			$_SESSION ['buildingName'] = $building;
-			
-			return false; // Registration failed
 		} else {
 			
 			unset ( $_SESSION ['error'] );
@@ -908,8 +934,10 @@ function createRoom($number, $building, $type) {
 			
 			$newRoom->execute ();
 			$pdo->commit ();
-			return true; // Registration succeded
+			$_SESSION ['success'] ['createRoom'] = 'The room was created';
 		}
+		header ( "Location: ../index.php#createRoom" );
+		exit ();
 	} catch ( PDOException $e ) {
 		echo 'Error: ' . $e->getMessage ();
 	}

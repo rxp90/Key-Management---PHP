@@ -8,6 +8,7 @@ $editingRoom = getRoomByID ( $id );
 $key = getKeyFromID ( $editingRoom->keys_id );
 ?>
 <hr>
+
 <form
 	action="./includes/process.php?action=editRoom"
 	method="POST"

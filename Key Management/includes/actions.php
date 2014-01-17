@@ -5,60 +5,11 @@ if (! isset ( $_SESSION )) {
 if (isset ( $_SESSION ['user'] )) { // Only showed if logged in
 	include_once ("./includes/Functions.php");
 	?>
-<script type="text/javascript">
-$(function(){
-
-	  // Bind the event.
-	  $(window).bind ('hashchange',  function(){
-	    // Alerts every time the hash changes!
-	    alert( location.hash );
-	  });
-
-	});
-
-function loadUserForm(id)
-{
-    var xmlhttp;
-    if (window.XMLHttpRequest)
-    {
-        xmlhttp = new XMLHttpRequest();
-    }
-    else
-    {
-        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    xmlhttp.onreadystatechange = function()
-    {
-        if(xmlhttp.readyState == 4 && xmlhttp.status == 200)
-        {
-            document.getElementById("editUserFormAJAX").innerHTML=xmlhttp.responseText;
-        }
-    }
-    xmlhttp.open("GET","./includes/editUser.php?id="+id,true);
-    xmlhttp.send();
-}
-function loadRoomForm(id)
-{
-    var xmlhttp;
-    if (window.XMLHttpRequest)
-    {
-        xmlhttp = new XMLHttpRequest();
-    }
-    else
-    {
-        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    xmlhttp.onreadystatechange = function()
-    {
-        if(xmlhttp.readyState == 4 && xmlhttp.status == 200)
-        {
-            document.getElementById("editRoomFormAJAX").innerHTML=xmlhttp.responseText;
-        }
-    }
-    xmlhttp.open("GET","./includes/editRoom.php?id="+id,true);
-    xmlhttp.send();
-}
-</script>
+<script
+	language="javascript"
+	type="text/javascript"
+	src="./js/AJAX.js"
+></script>
 
 <ul class="nav nav-pills nav-stacked verticalMenu">
 	<li class="active"><a
@@ -68,7 +19,7 @@ function loadRoomForm(id)
 	<?php
 	printAdminLinks ();
 	printDoormanLinks ();
-	printUserLinks();
+	printUserLinks ();
 	?>
 </ul>
 
@@ -82,7 +33,11 @@ function loadRoomForm(id)
 			id="editProfile"
 		>
 			<h1>Edit profile</h1>
-
+<?php
+	if (isset ( $_SESSION ['success'] ['editProfile'] )) {
+		echo '<div class="alert alert-success">' . $_SESSION ['success'] ['editProfile'] . '</div>';
+	}
+	?>
 			<form
 				action="./includes/process.php?action=editProfile"
 				method="POST"
@@ -128,21 +83,7 @@ function loadRoomForm(id)
 						value="<?php if(isset($_SESSION['user'])) { echo $_SESSION['user']->name; }else{ echo '';}?>"
 					>
 				</div>
-				<div
-					class="form-group <?php isset($_SESSION ['error'] ['birthdate']) ? 'has-error' : '';?>"
-				>
-					<label for="editBirthdate">Birthdate</label>
-					<input
-						id="birthdate"
-						name="editBirthdate"
-						type="text"
-						class="form-control"
-						placeholder="Birthdate"
-						required=""
-						pattern="(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))"
-						value="<?php if(isset($_SESSION['user'])) { echo $_SESSION['user']->birthdate; }else{ echo '';}?>"
-					>
-				</div>
+				
 				
 				<?php
 	
@@ -187,14 +128,7 @@ function loadRoomForm(id)
 						>Doorman</option>
 					</select>
 				</div>
-				<input
-					class="btn btn-danger btn-block"
-					type="submit"
-					name="delete"
-					value="Delete"
-				>
-				
-				<?php }?>
+					<?php }?>
 				<input
 					class="btn btn-primary btn-block"
 					type="submit"
@@ -223,6 +157,7 @@ function loadRoomForm(id)
 		printUserList ();
 		
 		echo '</div>';
+		
 		// <!-------------------------------- ROOM_LIST --------------------------------->
 		echo '<div
 	class="tab-pane fade"
@@ -234,6 +169,7 @@ function loadRoomForm(id)
 		printRoomList ();
 		
 		echo '</div>';
+		
 		?>
 	
 <?php }?>
@@ -251,7 +187,7 @@ function loadRoomForm(id)
 			<div>';
 		echo '<h1>Key log</h1>';
 		
-		printKeyLog ();
+		getKeyLogs ();
 		echo '</div></div>';
 	}
 	if (checkUserType ( 'REGULAR' )) {

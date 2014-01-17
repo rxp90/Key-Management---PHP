@@ -8,6 +8,7 @@ $editingUser = getUserByID ( $id );
 $accessList = getAccessList ( $id );
 ?>
 <hr>
+
 <form
 	action="./includes/process.php?action=editProfile"
 	method="POST"
@@ -51,21 +52,6 @@ $accessList = getAccessList ( $id );
 			placeholder="Name"
 			required=""
 			value="<?php if(isset($editingUser)) { echo $editingUser->name; }else{ echo '';}?>"
-		>
-	</div>
-	<div
-		class="form-group <?php isset($_SESSION ['error'] ['birthdate']) ? 'has-error' : '';?>"
-	>
-		<label for="editBirthdate">Birthdate</label>
-		<input
-			id="birthdate"
-			name="editBirthdate"
-			type="text"
-			class="form-control"
-			placeholder="Birthdate"
-			required=""
-			pattern="(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))"
-			value="<?php if(isset($editingUser)) { echo $editingUser->birthdate; }else{ echo '';}?>"
 		>
 	</div>
 	<!-------------------------------- END_USER --------------------------------->

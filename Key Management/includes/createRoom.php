@@ -10,6 +10,11 @@
 		id="form-signup"
 		class="form-signin-big"
 	>
+	<?php
+	if (isset ( $_SESSION ['success'] ['createRoom'] )) {
+		echo '<div class="alert alert-success">' . $_SESSION ['success'] ['createRoom'] . '</div>';
+	}
+	?>
 		<div
 			class="form-group <?php isset($_SESSION ['error'] ['roomNumber']) ? 'has-error' : '';?>"
 		>
@@ -20,7 +25,7 @@
 				placeholder="Room number"
 				required=""
 				autofocus=""
-				value="<?php isset($_SESSION['roomNumber']) ? $_SESSION['roomNumber'] : '';?>"
+				value="<?php if(isset($_SESSION['roomNumber'])){echo $_SESSION['roomNumber'];}?>"
 			>
 						<?php
 						if (isset ( $_SESSION ['error'] ['roomNumber'] )) {
@@ -34,7 +39,7 @@
 			class="form-control"
 			placeholder="Building name"
 			required=""
-			value="<?php isset($_SESSION['buildingName']) ? $_SESSION['buildingName'] : '';?>"
+			value="<?php if(isset($_SESSION['buildingName'])){echo $_SESSION['buildingName'];}?>"
 		>
 		<div class="form-group">
 			<label for="roomType">Room type</label> <select

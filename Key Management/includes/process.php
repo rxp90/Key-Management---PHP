@@ -7,16 +7,7 @@ if ($_GET ['action'] == 'signup') {
 		$email = $_POST ['signupEmail'];
 		$password = $_POST ['signupPassword'];
 		$name = $_POST ['signupName'];
-		$birthdate = $_POST ['signupBirthdate'];
-		
-		if (createUser ( $email, $password, $name, $birthdate )) {
-			header ( "Location: ./correctOperation.php" );
-		} else {
-			header ( "Location: ../index.php" );
-			// Usar hashChange para redirigir bien y simular clic
-		}
-		
-		exit ();
+		createUser ( $email, $password, $name );
 	}
 }
 // Create room. The key is created automatically
@@ -25,13 +16,7 @@ if ($_GET ['action'] == 'createRoom') {
 		$number = $_POST ['roomNumber'];
 		$building = $_POST ['buildingName'];
 		$type = $_POST ['roomType'];
-		if (createRoom ( $number, $building, $type )) {
-			header ( "Location: ./correctOperation.php" );
-		} else {
-			header ( "Location: ../index.php" );
-		}
-		
-		exit ();
+		createRoom ( $number, $building, $type );
 	}
 }
 // Log in
@@ -39,13 +24,7 @@ if ($_GET ['action'] == 'login') {
 	if (isset ( $_POST ['loginSubmit'] )) {
 		$email = $_POST ['loginEmail'];
 		$password = $_POST ['loginPassword'];
-		if (checkPassword ( $email, $password )) {
-			header ( "Location: ../index.php" );
-		} else {
-			// header ( "Location: ../index.php" );// Wrong password
-		}
-		
-		exit ();
+		checkPassword ( $email, $password );
 	}
 }
 
@@ -55,16 +34,11 @@ if ($_GET ['action'] == 'editProfile') {
 		$id = $_POST ['editID'];
 		$email = $_POST ['editEmail'];
 		$name = $_POST ['editName'];
-		$birthdate = $_POST ['editBirthdate'];
 		$active = $_POST ['editActive'];
 		$type = $_POST ['editType'];
 		$access = $_POST ['access'];
 		if (checkUserType ( 'ADMIN' ) || $id == $_SESSION ['user']->id) { // Either the user is an ADMIN or he's modifying his own profile
-			if (editUser ( $id, $email, $name, $birthdate, $active, $type, $access )) {
-				header ( "Location: ../index.php" ); // Edited correctly
-			} else {
-				header ( "Location: ../index.php" ); // Error
-			}
+			editUser ( $id, $email, $name, $active, $type, $access );
 		} else {
 		}
 		exit ();
@@ -83,14 +57,11 @@ if ($_GET ['action'] == 'editRoom') {
 		$id = $_POST ['editID'];
 		$number = $_POST ['roomNumber'];
 		$building = $_POST ['buildingName'];
+		$type = $_POST ['roomType'];
 		
-		if (checkUserType ( 'ADMIN' ) && editRoom ( $id, $number, $building )) {
-			header ( "Location: ../index.php" ); // Edited correctly
-		} else {
-			header ( "Location: ../index.php" ); // Error
+		if (checkUserType ( 'ADMIN' )) {
+			editRoom ( $id, $number, $building, $type );
 		}
-		
-		exit ();
 	} else if ($_POST ['delete']) {
 		$id = $_POST ['editID'];
 		if (checkUserType ( 'ADMIN' )) {
@@ -107,32 +78,32 @@ if (strpos ( $_GET ['action'], 'getKey?id=' ) !== false) { // Not the best way..
 	$id = $pieces [1];
 	if (isAvailable ( $id )) {
 		addToLog ( $id, $_SESSION ['user']->id );
+		header ( "Location: ../index.php#keyLogsUser" );
+		exit ();
 	} else {
 		// Key not available
 	}
 }
 // Transfer key
-if (strpos ( $_GET ['action'], 'transferKey?id=' ) !== false) { // Not the best way...
-	
-	$parameters = explode ( '?', $_GET ['action'] );
-	$values = explode ( '=', $parameters );
-	$id = $values [1];
-	$uid = $values [3];
-	if (transferKey ( $keyId, $userID )) {
-		// Correct
-	} else {
-		// Error
+if ($_GET ['action'] == 'transferKey') {
+	if (isset ( $_POST ['transferUser'] )) {
+		$uid = $_POST ['transferUser'];
+		$keyId = $_POST ['keyID'];
+		if (transferKey ( $keyId, $uid )) {
+			header ( "Location: ../index.php#keyLogsUser" );
+			exit ();
+		}
 	}
 }
+
 // Return key
 if (strpos ( $_GET ['action'], 'returnKey?id=' ) !== false) { // Not the best way...
 	
 	$pieces = explode ( '=', $_GET ['action'] );
 	$id = $pieces [1];
 	if (returnKey ( $id )) {
-		// Correct
-	} else {
-		// Error
+		header ( "Location: ../index.php#keyLogsUser" );
+		exit ();
 	}
 }
 // Logout

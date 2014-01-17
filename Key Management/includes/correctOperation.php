@@ -13,7 +13,7 @@
 >
 <meta
 	http-equiv="refresh"
-	content="5;URL=../index.php"
+	content="2;URL=../index.php"
 />
 </head>
 <div class="jumbotron">
@@ -23,7 +23,7 @@
 		src="../images/success.png"
 	>
 	<div>
-		<h1>Created!</h1>
+		<h1>Sucess!!</h1>
 		<p>You are being redirecting to the main page</p>
 	</div>
 
